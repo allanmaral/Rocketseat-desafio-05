@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import api from '../../services/api';
 
 import Container from '../../components/container';
-import { Loading, Owner, IssueList } from './styles';
+import { Loading, Owner, IssueList, PageNavigator } from './styles';
 
 class Repository extends Component {
   constructor(props) {
@@ -14,11 +14,24 @@ class Repository extends Component {
       repository: {},
       issues: [],
       loading: true,
+      page: 1,
     };
   }
 
   async componentDidMount() {
+    this.loadIssues();
+  }
+
+  componentDidUpdate(_, prevState) {
+    const { page } = this.state;
+    if (prevState.page !== page) {
+      this.loadIssues();
+    }
+  }
+
+  async loadIssues() {
     const { match } = this.props;
+    const { page } = this.state;
 
     const repoName = decodeURIComponent(match.params.repository);
 
@@ -28,6 +41,7 @@ class Repository extends Component {
         params: {
           state: 'open',
           per_page: 5,
+          page,
         },
       }),
     ]);
@@ -39,8 +53,15 @@ class Repository extends Component {
     });
   }
 
+  handlePageChange(value) {
+    const { page } = this.state;
+    if (!(value === -1 && page === 1)) {
+      this.setState({ page: page + value });
+    }
+  }
+
   render() {
-    const { repository, issues, loading } = this.state;
+    const { repository, issues, loading, page } = this.state;
 
     if (loading) {
       return <Loading>Carregando</Loading>;
@@ -69,6 +90,23 @@ class Repository extends Component {
               </div>
             </li>
           ))}
+          <PageNavigator>
+            <button
+              type="button"
+              disabled={page === 1}
+              onClick={() => this.handlePageChange(-1)}
+            >
+              ◄
+            </button>
+            <span>{page}</span>
+            <button
+              type="button"
+              disabled={issues.length < 5}
+              onClick={() => this.handlePageChange(1)}
+            >
+              ►
+            </button>
+          </PageNavigator>
         </IssueList>
       </Container>
     );

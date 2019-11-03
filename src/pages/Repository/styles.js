@@ -102,3 +102,38 @@ export const IssueList = styled.ul`
     }
   }
 `;
+
+export const PageNavigator = styled.div`
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+
+  &::before {
+    width: 100%;
+    text-align: center;
+    content: 'Página';
+    margin-top: 10px;
+
+    font-size: 16px;
+    font-weight: bold;
+  }
+
+  span {
+    font-size: 16px;
+  }
+
+  button {
+    background: none;
+    border: 0;
+    outline: none;
+    color: #7159c1;
+    margin: 5px 10px;
+  }
+
+  button:disabled {
+    cursor: not-allowed;
+    color: #eee;
+  }
+`;
