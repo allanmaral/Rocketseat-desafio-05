@@ -47,6 +47,9 @@ export const IssueList = styled.ul`
   margin-top: 30px;
   border-top: 1px solid #eee;
   list-style: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 
   li {
     display: flex;
@@ -54,6 +57,7 @@ export const IssueList = styled.ul`
     border: 1px solid #eee;
     border-radius: 4px;
     border: 2px solid #eee;
+    width: 100%;
 
     & + li {
       margin-top: 10px;
@@ -74,6 +78,8 @@ export const IssueList = styled.ul`
         font-size: 16px;
 
         a {
+          display: flex;
+          flex-direction: row;
           text-decoration: none;
           color: #333;
 
@@ -136,4 +142,25 @@ export const PageNavigator = styled.div`
     cursor: not-allowed;
     color: #eee;
   }
+`;
+
+export const StateSelector = styled.select`
+  margin-bottom: 30px;
+  max-width: 100px;
+`;
+
+export const IssueState = styled.div`
+  margin-top: 6px;
+  margin-right: 8px;
+  padding: 4px;
+  border-radius: 4px;
+  width: 24px;
+  height: 24px;
+
+  flex: 0 !important;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: ${({ closed }) => (closed ? '#cb2431' : '#2cbe4e')};
 `;

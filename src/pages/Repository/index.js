@@ -1,11 +1,19 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
+import { GoIssueClosed, GoIssueOpened } from 'react-icons/go';
 
 import api from '../../services/api';
 
 import Container from '../../components/container';
-import { Loading, Owner, IssueList, PageNavigator } from './styles';
+import {
+  Loading,
+  Owner,
+  IssueList,
+  PageNavigator,
+  StateSelector,
+  IssueState,
+} from './styles';
 
 class Repository extends Component {
   constructor(props) {
@@ -15,23 +23,24 @@ class Repository extends Component {
       issues: [],
       loading: true,
       page: 1,
+      issueState: 'open',
     };
   }
 
-  async componentDidMount() {
+  componentDidMount = () => {
     this.loadIssues();
-  }
+  };
 
-  componentDidUpdate(_, prevState) {
-    const { page } = this.state;
-    if (prevState.page !== page) {
+  componentDidUpdate = (_, prevState) => {
+    const { page, issueState } = this.state;
+    if (prevState.page !== page || prevState.issueState !== issueState) {
       this.loadIssues();
     }
-  }
+  };
 
-  async loadIssues() {
+  loadIssues = async () => {
     const { match } = this.props;
-    const { page } = this.state;
+    const { page, issueState } = this.state;
 
     const repoName = decodeURIComponent(match.params.repository);
 
@@ -39,7 +48,7 @@ class Repository extends Component {
       api.get(`/repos/${repoName}`),
       api.get(`/repos/${repoName}/issues`, {
         params: {
-          state: 'open',
+          state: issueState,
           per_page: 5,
           page,
         },
@@ -51,17 +60,21 @@ class Repository extends Component {
       issues: issues.data,
       loading: false,
     });
-  }
+  };
 
-  handlePageChange(value) {
+  handlePageChange = value => {
     const { page } = this.state;
     if (!(value === -1 && page === 1)) {
       this.setState({ page: page + value });
     }
-  }
+  };
+
+  handleChangeIssueState = event => {
+    this.setState({ issueState: event.target.value });
+  };
 
   render() {
-    const { repository, issues, loading, page } = this.state;
+    const { repository, issues, loading, page, issueState } = this.state;
 
     if (loading) {
       return <Loading>Carregando</Loading>;
@@ -76,9 +89,24 @@ class Repository extends Component {
           <p>{repository.description}</p>
         </Owner>
         <IssueList>
+          <StateSelector
+            onChange={this.handleChangeIssueState}
+            value={issueState}
+          >
+            <option value="all">Todos</option>
+            <option value="open">Abertos</option>
+            <option value="closed">Fechados</option>
+          </StateSelector>
           {issues.map(issue => (
             <li key={String(issue.id)}>
               <img src={issue.user.avatar_url} alt={issue.user.login} />
+              <IssueState closed={issue.state !== 'open'}>
+                {issue.state === 'open' ? (
+                  <GoIssueOpened size={16} color="#fff" />
+                ) : (
+                  <GoIssueClosed size={16} color="#fff" />
+                )}
+              </IssueState>
               <div>
                 <strong>
                   <a href={issue.html_url}>{issue.title}</a>
